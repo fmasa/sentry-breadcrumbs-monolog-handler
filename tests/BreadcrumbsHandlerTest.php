@@ -6,6 +6,7 @@ namespace Fmasa\SentryBreadcrumbsMonologHandler;
 
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Sentry\Event;
 use Sentry\State\HubInterface;
 use Sentry\State\Scope;
 
@@ -42,7 +43,11 @@ final class BreadcrumbsHandlerTest extends TestCase
 
         $this->handler->handle($record);
 
-        $breadcrumbs = $this->scope->getBreadcrumbs();
+        $event = new Event();
+
+        $this->scope->applyToEvent($event, []);
+
+        $breadcrumbs = $event->getBreadcrumbs();
 
         $this->assertCount(1, $breadcrumbs);
         $this->assertSame($record['message'], $breadcrumbs[0]->getMessage());
