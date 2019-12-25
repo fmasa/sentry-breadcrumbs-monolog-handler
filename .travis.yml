@@ -10,6 +10,7 @@ php:
   - 7.1
   - 7.2
   - 7.3
+  - 7.4
 
 jobs:
   include:
@@ -17,11 +18,11 @@ jobs:
       env:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-stable"
 
-    - php: 7.3
+    - php: 7.4
       env:
         - COVERAGE="--coverage-clover build/logs/clover.xml"
     - stage: Coding standard
-      php: 7.3
+      php: 7.4
       install: travis_retry composer install --prefer-dist
       script: vendor/bin/phpcs
 
@@ -37,5 +38,3 @@ script:
 after_script:
   - if [ "$COVERAGE" != "" ]; then vendor/bin/coveralls --verbose || true; fi
 
-after_failure:
-  - php: 7.4snapshot
