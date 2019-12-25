@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Fmasa\SentryBreadcrumbsMonologHandler;
 
+use Mockery;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Sentry\Event;
@@ -22,10 +23,10 @@ final class BreadcrumbsHandlerTest extends TestCase
     {
         $this->scope = new Scope();
 
-        $hub = $this->createMock(HubInterface::class);
-        $hub->expects($this->once())
-            ->method('configureScope')
-            ->willReturnCallback(function (callable $callback) {
+        $hub = Mockery::mock(HubInterface::class);
+        $hub->shouldReceive('configureScope')
+            ->once()
+            ->andReturnUsing(function (callable $callback) {
                 return $callback($this->scope);
             });
 
@@ -53,5 +54,10 @@ final class BreadcrumbsHandlerTest extends TestCase
         $this->assertSame($record['message'], $breadcrumbs[0]->getMessage());
         $this->assertSame($record['context'], $breadcrumbs[0]->getMetadata());
         $this->assertSame('default', $breadcrumbs[0]->getType());
+    }
+
+    protected function tearDown() : void
+    {
+        Mockery::close();
     }
 }
