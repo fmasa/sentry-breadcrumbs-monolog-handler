@@ -42,7 +42,7 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
                 new Breadcrumb(
                     $this->convertMonologLevelToSentryLevel($record['level']),
                     Breadcrumb::TYPE_DEFAULT,
-                    'default',
+                    $record['channel'],
                     $record['message'],
                     $record['context'] ?? null
                 )

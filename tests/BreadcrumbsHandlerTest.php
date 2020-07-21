@@ -37,6 +37,7 @@ final class BreadcrumbsHandlerTest extends TestCase
     {
         $record = [
             'message' => 'Test message',
+            'channel' => 'app',
             'level' => Logger::WARNING,
             'context' => ['option' => 'value'],
             'extra' => [],
@@ -54,6 +55,7 @@ final class BreadcrumbsHandlerTest extends TestCase
         $this->assertSame($record['message'], $breadcrumbs[0]->getMessage());
         $this->assertSame($record['context'], $breadcrumbs[0]->getMetadata());
         $this->assertSame('default', $breadcrumbs[0]->getType());
+        $this->assertSame('app', $breadcrumbs[0]->getCategory());
     }
 
     protected function tearDown() : void
