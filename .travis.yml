@@ -19,6 +19,8 @@ jobs:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-stable"
 
     - php: 7.4
+      before_install:
+        travis_retry pecl install pcov
       env:
         - COVERAGE="--coverage-clover build/logs/clover.xml"
     - stage: Coding standard
