@@ -11,18 +11,17 @@ use Sentry\Breadcrumb;
 use Sentry\Event;
 use Sentry\State\HubInterface;
 use Sentry\State\Scope;
+
 use function defined;
 use function method_exists;
 
 final class BreadcrumbsHandlerTest extends TestCase
 {
-    /** @var Scope */
-    private $scope;
+    private Scope $scope;
 
-    /** @var BreadcrumbsHandler */
-    private $handler;
+    private BreadcrumbsHandler $handler;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->scope = new Scope();
 
@@ -36,7 +35,7 @@ final class BreadcrumbsHandlerTest extends TestCase
         $this->handler = new BreadcrumbsHandler($hub);
     }
 
-    public function testWriteRecord() : void
+    public function testWriteRecord(): void
     {
         $record = [
             'message' => 'Test message',
@@ -55,7 +54,7 @@ final class BreadcrumbsHandlerTest extends TestCase
         $this->assertSame('app', $breadcrumbs[0]->getCategory());
     }
 
-    public function testWriteRecordSetsCorrectLevel() : void
+    public function testWriteRecordSetsCorrectLevel(): void
     {
         $record = [
             'message' => 'Test message',
@@ -78,7 +77,7 @@ final class BreadcrumbsHandlerTest extends TestCase
      *
      * @return Breadcrumb[]
      */
-    private function handleRecord(array $record) : array
+    private function handleRecord(array $record): array
     {
         $this->handler->handle($record);
 
@@ -95,7 +94,7 @@ final class BreadcrumbsHandlerTest extends TestCase
         return $event->getBreadcrumbs();
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         Mockery::close();
     }

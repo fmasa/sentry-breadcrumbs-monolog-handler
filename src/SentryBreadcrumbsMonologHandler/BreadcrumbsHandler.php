@@ -9,12 +9,13 @@ use Monolog\Logger;
 use Sentry\Breadcrumb;
 use Sentry\State\HubInterface;
 use Sentry\State\Scope;
+
 use function defined;
 
 final class BreadcrumbsHandler extends AbstractProcessingHandler
 {
     /** @var array<string, string> */
-    private static $levels = [
+    private static array $levels = [
         Logger::DEBUG => Breadcrumb::LEVEL_DEBUG,
         Logger::INFO => Breadcrumb::LEVEL_INFO,
         Logger::NOTICE => Breadcrumb::LEVEL_INFO,
@@ -23,8 +24,7 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
         // Logger::CRITICAL, Logger::ALERT and Logger::EMERGENCY are set in the constructor
     ];
 
-    /** @var HubInterface */
-    private $hub;
+    private HubInterface $hub;
 
     public function __construct(HubInterface $hub)
     {
@@ -40,9 +40,9 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
     /**
      * @param array<string, mixed> $record
      */
-    protected function write(array $record) : void
+    protected function write(array $record): void
     {
-        $this->hub->configureScope(function (Scope $scope) use ($record) : void {
+        $this->hub->configureScope(function (Scope $scope) use ($record): void {
             $scope->addBreadcrumb(
                 new Breadcrumb(
                     $this->convertMonologLevelToSentryLevel($record['level']),
@@ -60,7 +60,7 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
      *
      * @param int $level The Monolog log level
      */
-    private function convertMonologLevelToSentryLevel(int $level) : string
+    private function convertMonologLevelToSentryLevel(int $level): string
     {
         return self::$levels[$level] ?? Breadcrumb::LEVEL_INFO;
     }
