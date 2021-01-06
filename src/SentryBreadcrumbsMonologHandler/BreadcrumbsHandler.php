@@ -10,18 +10,17 @@ use Sentry\Breadcrumb;
 use Sentry\State\HubInterface;
 use Sentry\State\Scope;
 
-use function defined;
-
 final class BreadcrumbsHandler extends AbstractProcessingHandler
 {
-    /** @var array<string, string> */
-    private static array $levels = [
+    private const LEVELS = [
         Logger::DEBUG => Breadcrumb::LEVEL_DEBUG,
         Logger::INFO => Breadcrumb::LEVEL_INFO,
         Logger::NOTICE => Breadcrumb::LEVEL_INFO,
         Logger::WARNING => Breadcrumb::LEVEL_WARNING,
         Logger::ERROR => Breadcrumb::LEVEL_ERROR,
-        // Logger::CRITICAL, Logger::ALERT and Logger::EMERGENCY are set in the constructor
+        Logger::CRITICAL => Breadcrumb::LEVEL_FATAL,
+        Logger::ALERT => Breadcrumb::LEVEL_FATAL,
+        Logger::EMERGENCY => Breadcrumb::LEVEL_FATAL,
     ];
 
     private HubInterface $hub;
@@ -30,11 +29,6 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
     {
         parent::__construct();
         $this->hub = $hub;
-
-        $criticalLevel                   = defined(Breadcrumb::class . '::LEVEL_FATAL') ? Breadcrumb::LEVEL_FATAL : Breadcrumb::LEVEL_CRITICAL;
-        self::$levels[Logger::CRITICAL]  = $criticalLevel;
-        self::$levels[Logger::ALERT]     = $criticalLevel;
-        self::$levels[Logger::EMERGENCY] = $criticalLevel;
     }
 
     /**
@@ -62,6 +56,6 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
      */
     private function convertMonologLevelToSentryLevel(int $level): string
     {
-        return self::$levels[$level] ?? Breadcrumb::LEVEL_INFO;
+        return self::LEVELS[$level] ?? Breadcrumb::LEVEL_INFO;
     }
 }
