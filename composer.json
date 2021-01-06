@@ -3,6 +3,9 @@
     "description": "Monolog handler that transform log entries into breadcrumbs",
     "type": "library",
     "license": "MIT",
+    "scripts": {
+        "cs": "phpcs"
+    },
     "authors": [
         {
             "name": "František Maša",
@@ -22,10 +25,8 @@
     "require-dev": {
         "php-http/curl-client": "^2.0",
         "guzzlehttp/psr7": "^1.6",
-        "doctrine/coding-standard": "^6.0",
-        "phpunit/phpunit": "^5.7",
-        "phpunit/phpcov": "^3.0",
-        "satooshi/php-coveralls": "^1.0",
+        "doctrine/coding-standard": "^8.1",
+        "phpunit/phpunit": "^9.5",
         "mockery/mockery": "^1.3"
     }
 }
