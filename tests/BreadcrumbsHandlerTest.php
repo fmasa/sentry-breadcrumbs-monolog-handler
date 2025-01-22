@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Fmasa\SentryBreadcrumbsMonologHandler;
 
+use DateTimeImmutable;
 use Mockery;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Sentry\Breadcrumb;
 use Sentry\Event;
@@ -13,7 +15,6 @@ use Sentry\State\HubInterface;
 use Sentry\State\Scope;
 
 use function defined;
-use function method_exists;
 
 final class BreadcrumbsHandlerTest extends TestCase
 {
@@ -37,32 +38,31 @@ final class BreadcrumbsHandlerTest extends TestCase
 
     public function testWriteRecord(): void
     {
-        $record = [
-            'message' => 'Test message',
-            'channel' => 'app',
-            'level' => Logger::WARNING,
-            'context' => ['option' => 'value'],
-            'extra' => [],
-        ];
+        $record = new LogRecord(
+            new DateTimeImmutable('2025-01-22 10:11:12'),
+            'app',
+            Level::Warning,
+            'Test message',
+            ['option' => 'value'],
+        );
 
         $breadcrumbs = $this->handleRecord($record);
 
         $this->assertCount(1, $breadcrumbs);
-        $this->assertSame($record['message'], $breadcrumbs[0]->getMessage());
-        $this->assertSame($record['context'], $breadcrumbs[0]->getMetadata());
+        $this->assertSame($record->message, $breadcrumbs[0]->getMessage());
+        $this->assertSame($record->context, $breadcrumbs[0]->getMetadata());
         $this->assertSame('default', $breadcrumbs[0]->getType());
         $this->assertSame('app', $breadcrumbs[0]->getCategory());
     }
 
     public function testWriteRecordSetsCorrectLevel(): void
     {
-        $record = [
-            'message' => 'Test message',
-            'channel' => 'app',
-            'level' => Logger::ALERT,
-            'context' => [],
-            'extra' => [],
-        ];
+        $record = new LogRecord(
+            new DateTimeImmutable('2025-01-22 10:11:12'),
+            'app',
+            Level::Alert,
+            'Test message',
+        );
 
         $expectedLevel = defined(Breadcrumb::class . '::LEVEL_FATAL') ? 'fatal' : 'critical';
 
@@ -73,23 +73,14 @@ final class BreadcrumbsHandlerTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $record
-     *
      * @return Breadcrumb[]
      */
-    private function handleRecord(array $record): array
+    private function handleRecord(LogRecord $record): array
     {
         $this->handler->handle($record);
 
-        if (method_exists(Event::class, 'createEvent')) {
-            // Sentry 3
-            $event = Event::createEvent();
-            $this->scope->applyToEvent($event);
-        } else {
-            // Sentry 2
-            $event = new Event();
-            $this->scope->applyToEvent($event, []);
-        }
+        $event = Event::createEvent();
+        $this->scope->applyToEvent($event);
 
         return $event->getBreadcrumbs();
     }

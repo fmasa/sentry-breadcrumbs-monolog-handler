@@ -18,13 +18,13 @@
         }
     },
     "require": {
-        "php": "^7.4 || ^8.0",
-        "sentry/sentry": "^3.0",
-        "monolog/monolog": "^1.2|^2.0"
+        "php": "^8.4",
+        "sentry/sentry": "^4.10",
+        "monolog/monolog": "^3.8"
     },
     "require-dev": {
-        "php-http/curl-client": "^2.0",
-        "guzzlehttp/psr7": "^1.6",
+        "php-http/curl-client": ">=2.3.3",
+        "guzzlehttp/psr7": ">=2.6.3",
         "doctrine/coding-standard": "^8.1",
         "phpunit/phpunit": "^9.5",
         "mockery/mockery": "^1.3"

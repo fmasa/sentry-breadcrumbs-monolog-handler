@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace Fmasa\SentryBreadcrumbsMonologHandler;
 
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Sentry\Breadcrumb;
 use Sentry\State\HubInterface;
 use Sentry\State\Scope;
 
 final class BreadcrumbsHandler extends AbstractProcessingHandler
 {
-    private const LEVELS = [
-        Logger::DEBUG => Breadcrumb::LEVEL_DEBUG,
-        Logger::INFO => Breadcrumb::LEVEL_INFO,
-        Logger::NOTICE => Breadcrumb::LEVEL_INFO,
-        Logger::WARNING => Breadcrumb::LEVEL_WARNING,
-        Logger::ERROR => Breadcrumb::LEVEL_ERROR,
-        Logger::CRITICAL => Breadcrumb::LEVEL_FATAL,
-        Logger::ALERT => Breadcrumb::LEVEL_FATAL,
-        Logger::EMERGENCY => Breadcrumb::LEVEL_FATAL,
+    private const array LEVELS = [
+        Level::Debug->value => Breadcrumb::LEVEL_DEBUG,
+        Level::Info->value => Breadcrumb::LEVEL_INFO,
+        Level::Notice->value => Breadcrumb::LEVEL_INFO,
+        Level::Warning->value => Breadcrumb::LEVEL_WARNING,
+        Level::Error->value => Breadcrumb::LEVEL_ERROR,
+        Level::Critical->value => Breadcrumb::LEVEL_FATAL,
+        Level::Alert->value => Breadcrumb::LEVEL_FATAL,
+        Level::Emergency->value => Breadcrumb::LEVEL_FATAL,
     ];
 
     private HubInterface $hub;
@@ -31,19 +32,17 @@ final class BreadcrumbsHandler extends AbstractProcessingHandler
         $this->hub = $hub;
     }
 
-    /**
-     * @param array<string, mixed> $record
-     */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         $this->hub->configureScope(function (Scope $scope) use ($record): void {
             $scope->addBreadcrumb(
                 new Breadcrumb(
-                    $this->convertMonologLevelToSentryLevel($record['level']),
+                    $this->convertMonologLevelToSentryLevel($record->level->value),
                     Breadcrumb::TYPE_DEFAULT,
-                    $record['channel'],
-                    $record['message'],
-                    $record['context'] ?? null
+                    $record->channel,
+                    $record->message,
+                    $record->context ?? null,
+                    $record->datetime->getTimestamp(),
                 )
             );
         });
